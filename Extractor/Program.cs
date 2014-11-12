@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
+using System.Linq;
 using System.Net;
 using CsQuery;
 
@@ -13,13 +12,14 @@ namespace Extractor
     {
         public static string Scheme = ConfigurationManager.AppSettings["Scheme"];
         public static string Host = ConfigurationManager.AppSettings["Host"];
+        //public static List<System.Uri> Links { get; set; }
+        //public static List<Article> Articles { get; set; }
+        public static DatabaseEntities DatabaseEntities;
         public static CQ Dom { get; set; }
-        public static List<Uri> Links { get; set; }
-        public static List<Article> Articles { get; set; }
 
         private static void Main()
         {
-            var url = new Uri(Scheme + "://" + Host);
+            var url = new System.Uri(Scheme + "://" + Host);
             //using (var writer = new StreamWriter("Links.txt", false))
             //{
             //    writer.WriteLine();
@@ -28,21 +28,26 @@ namespace Extractor
             //{
             //    writer.WriteLine();
             //}
-            Links = new List<Uri>();
+            //Links = new List<System.Uri>();
             //Articles = new List<Article>();
+            DatabaseEntities = new DatabaseEntities();
             FindArticles(url);
         }
 
-        private static void FindArticles(Uri url)
+        public static void FindArticles(System.Uri url)
         {
-            if (url == null || Links.Exists(link => link == url) || url.Host != Host)
+            //if (url == null || Links.Exists(link => link == url) || url.Host != Host)
+            if (url == null || (from uris in DatabaseEntities.Uris
+                                where uris.AbsoluteUri == url.AbsoluteUri
+                                select uris.Id).Any() || url.Host != Host)
                 return;
             //using (var writer = new StreamWriter("Links.txt", true))
             //{
             //    writer.WriteLine(url);
             //}
-            //Debug.WriteLine(url);
-            Links.Add(url);
+            Debug.WriteLine(url);
+            DatabaseEntities.Uris.Add(new Uri {AbsoluteUri = url.ToString()});
+            DatabaseEntities.SaveChanges();
             try
             {
                 Dom = CQ.CreateFromUrl(url.ToString());
@@ -60,8 +65,8 @@ namespace Extractor
                     //    writer.WriteLine(Convert.ToInt32(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML));
                     //    Dom.Select("[rel='category tag']").Each(o => writer.WriteLine(o.InnerHTML));
                     //}
-                    Article article = /*new
-                    Articles.Add(*/new Article
+                    var article = /*new
+                    Articles.Add(*/ new Article
                         {
                             Link = url.ToString(),
                             //Picture = ParseUri(Dom.Select(".opz_product img").Get(0).GetAttribute("src")).ToString(),
@@ -71,12 +76,11 @@ namespace Extractor
                                     Dom.Select(".opz_product .lzr_preciofichasart_iva").Get(0).InnerHTML.Split(' ')[0],
                                     new CultureInfo("es-ES")),
                             //Units = Convert.ToInt32(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
-                            Units = Convert.ToByte(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
+                            //Units = Convert.ToByte(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
                             //Categories = new List<string>(Dom.Select("[rel='category tag']").Map(o => o.InnerHTML))
-                        }/*);*/;
-                    DatabaseEntities databaseEntities = new DatabaseEntities();
-                    databaseEntities.Articles.Add(article);
-                    databaseEntities.SaveChanges();
+                        } /*);*/;
+                    DatabaseEntities.Articles.Add(article);
+                    DatabaseEntities.SaveChanges();
                 }
                 Dom.Select("a")
                    .Each(link => FindArticles(ParseUri(link.HasAttribute("href") ? link.GetAttribute("href") : "")));
@@ -87,14 +91,14 @@ namespace Extractor
             }
         }
 
-        private static Uri ParseUri(string href)
+        private static System.Uri ParseUri(string href)
         {
-            if (Uri.IsWellFormedUriString(href, UriKind.Absolute)) return new Uri(href);
+            if (System.Uri.IsWellFormedUriString(href, UriKind.Absolute)) return new System.Uri(href);
             if (!href.StartsWith("/"))
             {
                 href = "/" + href;
             }
-            if (Uri.IsWellFormedUriString(href, UriKind.Relative))
+            if (System.Uri.IsWellFormedUriString(href, UriKind.Relative))
             {
                 href = Scheme + "://" + Host + href;
             }
@@ -102,7 +106,7 @@ namespace Extractor
             {
                 return null;
             }
-            return new Uri(href);
+            return new System.Uri(href);
         }
     }
 }

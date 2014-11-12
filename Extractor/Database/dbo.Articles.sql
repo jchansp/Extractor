@@ -1,9 +1,16 @@
-﻿CREATE TABLE [dbo].[Articles]
-(
-	[Id] INT NOT NULL PRIMARY KEY, 
-    [Link] NVARCHAR(50) NULL, 
-    [Picture] IMAGE NULL, 
-    [Price] MONEY NULL, 
-    [Title] NVARCHAR(50) NULL, 
-    [Units] TINYINT NULL
-)
+﻿IF EXISTS (
+		SELECT *
+		FROM sys.tables
+		WHERE NAME = 'Articles'
+		)
+	DROP TABLE dbo.Articles;
+
+CREATE TABLE dbo.Articles (
+	Id UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID()
+	,Link NVARCHAR(MAX) NULL
+	,Picture IMAGE NULL
+	,Price MONEY NULL
+	,Title NVARCHAR(MAX) NOT NULL
+	,Units TINYINT NULL
+	,PRIMARY KEY CLUSTERED (Id ASC)
+	);

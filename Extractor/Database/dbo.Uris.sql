@@ -1,0 +1,12 @@
+﻿IF EXISTS (
+		SELECT *
+		FROM sys.tables
+		WHERE NAME = 'Uris'
+		)
+	DROP TABLE dbo.Uris;
+
+CREATE TABLE dbo.Uris (
+	Id UNIQUEIDENTIFIER DEFAULT(newid()) NOT NULL
+	,AbsoluteUri NVARCHAR(MAX) NOT NULL
+	,PRIMARY KEY CLUSTERED (Id ASC)
+	);

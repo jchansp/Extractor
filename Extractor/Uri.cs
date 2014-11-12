@@ -12,13 +12,9 @@ namespace Extractor
     using System;
     using System.Collections.Generic;
     
-    public partial class Article
+    public partial class Uri
     {
         public System.Guid Id { get; set; }
-        public string Link { get; set; }
-        public byte[] Picture { get; set; }
-        public Nullable<decimal> Price { get; set; }
-        public string Title { get; set; }
-        public Nullable<byte> Units { get; set; }
+        public string AbsoluteUri { get; set; }
     }
 }
