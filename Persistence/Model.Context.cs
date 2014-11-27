@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Extractor
+namespace Persistence
 {
     using System;
     using System.Data.Entity;

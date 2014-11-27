@@ -1,10 +1,9 @@
-﻿using System;
+﻿using CsQuery;
+using Persistence;
+using System;
 using System.Configuration;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using System.Net;
-using CsQuery;
 
 namespace Extractor
 {
@@ -14,12 +13,12 @@ namespace Extractor
         public static string Host = ConfigurationManager.AppSettings["Host"];
         //public static List<System.Uri> Links { get; set; }
         //public static List<Article> Articles { get; set; }
-        public static DatabaseEntities DatabaseEntities;
+        //public static DatabaseEntities DatabaseEntities;
         public static CQ Dom { get; set; }
 
         private static void Main()
         {
-            var url = new System.Uri(Scheme + "://" + Host);
+            var url = new Uri(Scheme + "://" + Host);
             //using (var writer = new StreamWriter("Links.txt", false))
             //{
             //    writer.WriteLine();
@@ -30,24 +29,22 @@ namespace Extractor
             //}
             //Links = new List<System.Uri>();
             //Articles = new List<Article>();
-            DatabaseEntities = new DatabaseEntities();
+            //DatabaseEntities = new DatabaseEntities();
             FindArticles(url);
         }
 
-        public static void FindArticles(System.Uri url)
+        public static void FindArticles(Uri url)
         {
             //if (url == null || Links.Exists(link => link == url) || url.Host != Host)
-            if (url == null || (from uris in DatabaseEntities.Uris
-                                where uris.AbsoluteUri == url.AbsoluteUri
-                                select uris.Id).Any() || url.Host != Host)
+            if (url == null || Uris.Exists(url) || url.Host != Host)
                 return;
             //using (var writer = new StreamWriter("Links.txt", true))
             //{
             //    writer.WriteLine(url);
             //}
             Debug.WriteLine(url);
-            DatabaseEntities.Uris.Add(new Uri {AbsoluteUri = url.ToString()});
-            DatabaseEntities.SaveChanges();
+            //DatabaseEntities.Uris.Add(new Uri {AbsoluteUri = url.ToString()});
+            //DatabaseEntities.SaveChanges();
             try
             {
                 Dom = CQ.CreateFromUrl(url.ToString());
@@ -65,25 +62,25 @@ namespace Extractor
                     //    writer.WriteLine(Convert.ToInt32(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML));
                     //    Dom.Select("[rel='category tag']").Each(o => writer.WriteLine(o.InnerHTML));
                     //}
-                    var article = /*new
-                    Articles.Add(*/ new Article
-                        {
-                            Link = url.ToString(),
-                            //Picture = ParseUri(Dom.Select(".opz_product img").Get(0).GetAttribute("src")).ToString(),
-                            Title = Dom.Select(".opz_product .opz_title").Get(0).InnerHTML,
-                            Price =
-                                Convert.ToDecimal(
-                                    Dom.Select(".opz_product .lzr_preciofichasart_iva").Get(0).InnerHTML.Split(' ')[0],
-                                    new CultureInfo("es-ES")),
-                            //Units = Convert.ToInt32(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
-                            //Units = Convert.ToByte(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
-                            //Categories = new List<string>(Dom.Select("[rel='category tag']").Map(o => o.InnerHTML))
-                        } /*);*/;
-                    DatabaseEntities.Articles.Add(article);
-                    DatabaseEntities.SaveChanges();
+                    //var article = /*new
+                    //Articles.Add(*/ new Article
+                    //    {
+                    //        Link = url.ToString(),
+                    //        //Picture = ParseUri(Dom.Select(".opz_product img").Get(0).GetAttribute("src")).ToString(),
+                    //        Title = Dom.Select(".opz_product .opz_title").Get(0).InnerHTML,
+                    //        Price =
+                    //            Convert.ToDecimal(
+                    //                Dom.Select(".opz_product .lzr_preciofichasart_iva").Get(0).InnerHTML.Split(' ')[0],
+                    //                new CultureInfo("es-ES")),
+                    //        //Units = Convert.ToInt32(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
+                    //        //Units = Convert.ToByte(Dom.Select(".opz_product .textounidadesf").Get(0).InnerHTML),
+                    //        //Categories = new List<string>(Dom.Select("[rel='category tag']").Map(o => o.InnerHTML))
+                    //    } /*);*/;
+                    //DatabaseEntities.Articles.Add(article);
+                    //DatabaseEntities.SaveChanges();
                 }
                 Dom.Select("a")
-                   .Each(link => FindArticles(ParseUri(link.HasAttribute("href") ? link.GetAttribute("href") : "")));
+                    .Each(link => FindArticles(ParseUri(link.HasAttribute("href") ? link.GetAttribute("href") : "")));
             }
             catch (WebException e)
             {
@@ -91,14 +88,14 @@ namespace Extractor
             }
         }
 
-        private static System.Uri ParseUri(string href)
+        private static Uri ParseUri(string href)
         {
-            if (System.Uri.IsWellFormedUriString(href, UriKind.Absolute)) return new System.Uri(href);
+            if (Uri.IsWellFormedUriString(href, UriKind.Absolute)) return new Uri(href);
             if (!href.StartsWith("/"))
             {
                 href = "/" + href;
             }
-            if (System.Uri.IsWellFormedUriString(href, UriKind.Relative))
+            if (Uri.IsWellFormedUriString(href, UriKind.Relative))
             {
                 href = Scheme + "://" + Host + href;
             }
@@ -106,7 +103,7 @@ namespace Extractor
             {
                 return null;
             }
-            return new System.Uri(href);
+            return new Uri(href);
         }
     }
 }

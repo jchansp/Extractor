@@ -5,8 +5,8 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="c0b03f5aefbf4004ae88fd97e9e5c325" Name="Diagram1">
-        <EntityTypeShape EntityType="DatabaseModel.Article" Width="1.5" PointX="5.3813659722830005" PointY="0.761690408346099" />
-        <EntityTypeShape EntityType="DatabaseModel.Uri" Width="1.5" PointX="7.875" PointY="0.875" />
+        <EntityTypeShape EntityType="DatabaseModel.Article" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="DatabaseModel.Uri" Width="1.5" PointX="2.75" PointY="0.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
