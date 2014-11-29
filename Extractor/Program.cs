@@ -1,20 +1,20 @@
-﻿using CsQuery;
-using Persistence;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.Net;
+using CsQuery;
+using Persistence;
 
 namespace Extractor
 {
-    public class Program
+    public static class Program
     {
-        public static string Scheme = ConfigurationManager.AppSettings["Scheme"];
-        public static string Host = ConfigurationManager.AppSettings["Host"];
+        private static readonly string Scheme = ConfigurationManager.AppSettings["Scheme"];
+        private static readonly string Host = ConfigurationManager.AppSettings["Host"];
         //public static List<System.Uri> Links { get; set; }
         //public static List<Article> Articles { get; set; }
         //public static DatabaseEntities DatabaseEntities;
-        public static CQ Dom { get; set; }
+        private static CQ Dom { get; set; }
 
         private static void Main()
         {
@@ -33,7 +33,7 @@ namespace Extractor
             FindArticles(url);
         }
 
-        public static void FindArticles(Uri url)
+        private static void FindArticles(Uri url)
         {
             //if (url == null || Links.Exists(link => link == url) || url.Host != Host)
             if (url == null || Uris.Exists(url) || url.Host != Host)
@@ -44,6 +44,7 @@ namespace Extractor
             //}
             Debug.WriteLine(url);
             //DatabaseEntities.Uris.Add(new Uri {AbsoluteUri = url.ToString()});
+            Uris.Add(url);
             //DatabaseEntities.SaveChanges();
             try
             {
